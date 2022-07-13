@@ -11,6 +11,7 @@ class DeepNet(nn.Module):
     """
     Deep part of Cross and Deep Network
     All of the layer in this module are full-connection layers
+    ### A fc/linear network
     """
 
     def __init__(self, input_feature_num, deep_layer: list):
@@ -51,11 +52,16 @@ class CrossNet(nn.Module):
         weight_b = []
         batchnorm = []
         for i in range(self.cross_layer):
+            # torch.empty: returns a tensor filled with uninitialized data
+            # torch.nn.init.normal_: fills the input Tensor with values drawn from the normal distribution
+            # nn.Parameter: a kind of Tensor that is to be considered a module parameter (i.e. model weights)
             weight_w.append(nn.Parameter(torch.nn.init.normal_(torch.empty(input_feature_num))))
             weight_b.append(nn.Parameter(torch.nn.init.normal_(torch.empty(input_feature_num))))
             batchnorm.append(nn.BatchNorm1d(input_feature_num, affine=False))
+        # nn.ParameterList: holds parameters in a list
         self.weight_w = nn.ParameterList(weight_w)
         self.weight_b = nn.ParameterList(weight_b)
+        # nn.ModuleList: holds submodules in a list
         self.batchnorm = nn.ModuleList(batchnorm)
 
     def forward(self, x):
