@@ -86,7 +86,8 @@ class CrossNet(nn.Module):
             output = self.batchnorm[i](output)
         return output
 
-
+    
+# RESUME: here to understand this model
 class CDNet(nn.Module):
     """
     Cross and Deep Network in Deep & Cross Network for Ad Click Predictions
