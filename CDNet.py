@@ -64,11 +64,25 @@ class CrossNet(nn.Module):
         # nn.ModuleList: holds submodules in a list
         self.batchnorm = nn.ModuleList(batchnorm)
 
+    """
+    # original forward function
     def forward(self, x):
         output = x
         x = x.reshape(x.shape[0], -1, 1)
         for i in range(self.cross_layer):
-            output = torch.matmul(torch.bmm(x, torch.transpose(output.reshape(output.shape[0], -1, 1), 1, 2)),self.weight_w[i]) + self.weight_b[i] + output
+            output = torch.matmul(torch.bmm(x, torch.transpose(output.reshape(output.shape[0], -1, 1), 1, 2)), self.weight_w[i]) + self.weight_b[i] + output
+            output = self.batchnorm[i](output)
+        return output
+    """
+    
+    # forward function with your edits for better read-ability
+    def forward(self, x):
+        output = x
+        output = output.reshape(output.shape[0], -1, 1)
+        output_trans = torch.transpose(output, 1, 2)
+        x = x.reshape(x.shape[0], -1, 1)
+        for i in range(self.cross_layer):
+            output = torch.matmul(torch.bmm(x, output_trans), self.weight_w[i]) + self.weight_b[i] + output
             output = self.batchnorm[i](output)
         return output
 
