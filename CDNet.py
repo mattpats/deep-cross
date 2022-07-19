@@ -87,14 +87,12 @@ class CrossNet(nn.Module):
         return output
 
     
-# RESUME: here to understand this model
 class CDNet(nn.Module):
     """
     Cross and Deep Network in Deep & Cross Network for Ad Click Predictions
     """
 
-    def __init__(self, embedding_index: list, embedding_size: list, dense_feature_num: int, cross_layer_num: int,
-                 deep_layer: list):
+    def __init__(self, embedding_index: list, embedding_size: list, dense_feature_num: int, cross_layer_num: int, deep_layer: list):
         """
         :param embedding_index: a list to show the index of the embedding_feature.
                                 [0,1,2] shows that index 0, index 1 and index 2 are different category feature
@@ -124,15 +122,18 @@ class CDNet(nn.Module):
 
     def forward(self, sparse_feature, dense_feature):
         num_sample = sparse_feature.shape[0]
+        
         if isinstance(self.embedding_index[0], list):
             embedding_feature = torch.mean(self.embedding_layer[0](sparse_feature[:, self.embedding_index[0]].to(torch.long)), dim=1)
         else:
             embedding_feature = torch.mean(self.embedding_layer[0](sparse_feature[:, self.embedding_index[0]].to(torch.long).reshape(num_sample, 1)), dim=1)
+        
         for i in range(1, len(self.embedding_index)):
             if isinstance(self.embedding_index[i], list):
                 embedding_feature = torch.cat((embedding_feature, torch.mean(self.embedding_layer[i](sparse_feature[:, self.embedding_index[i]].to(torch.long)), dim=1)), dim=1)
             else:
                 embedding_feature = torch.cat((embedding_feature, torch.mean(self.embedding_layer[i](sparse_feature[:, self.embedding_index[i]].to(torch.long).reshape(num_sample, 1)), dim=1)), dim=1)
+        
         input_feature = torch.cat((embedding_feature, dense_feature), 1)
         input_feature = self.batchnorm(input_feature)
         out_cross = self.CrossNet(input_feature)
