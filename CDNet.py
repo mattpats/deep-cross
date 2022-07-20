@@ -112,7 +112,12 @@ class CDNet(nn.Module):
         input_feature_num = np.sum(embedding_num) + dense_feature_num
         embedding_list = []
         for i in range(len(embedding_size)):
+            # embedding_size[i]: num_embeddings (int) – size of the dictionary of embeddings
+            # embedding_num[i]: embedding_dim (int) – the size of each embedding vector
+            # scale_grad_by_freq – If True, this will scale gradients by the inverse of frequency of the words in the mini-batch
             embedding_list.append(nn.Embedding(embedding_size[i], embedding_num[i], scale_grad_by_freq=True))
+        # ModuleList can be indexed like a regular Python list, but modules it contains are properly registered, and will be visible by all Module methods.
+        # Module: Base class for all neural network modules.
         self.embedding_layer = nn.ModuleList(embedding_list)
         self.batchnorm = nn.BatchNorm1d(input_feature_num, affine=False)
         self.CrossNet = CrossNet(input_feature_num, cross_layer_num)
